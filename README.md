@@ -12,6 +12,12 @@ in a very iterative, intuitive and rewarding way.
 For all things RIFE2, head on to the project website:
 [https://rife2.com](https://rife2.com)
 
+## Run the tests
+
+```bash
+./gradlew clean test
+```
+
 ## Running the server
 
 ```bash
