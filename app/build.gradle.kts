@@ -28,7 +28,7 @@ sourceSets.main {
 }
 
 dependencies {
-    implementation("com.uwyn.rife2:rife2:1.1.0-SNAPSHOT")
+    implementation("com.uwyn.rife2:rife2:1.1.0")
     runtimeOnly("org.eclipse.jetty:jetty-server:11.0.13")
     runtimeOnly("org.eclipse.jetty:jetty-servlet:11.0.13")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
