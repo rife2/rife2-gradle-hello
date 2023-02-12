@@ -10,6 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AppTest {
     @Test
+    void verifyRoot() {
+        var m = new MockConversation(new App());
+        assertEquals(m.doRequest("/").getStatus(), 302);
+    }
+
+    @Test
     void verifyHello() {
         var m = new MockConversation(new App());
         assertEquals("Hello", m.doRequest("/hello")
