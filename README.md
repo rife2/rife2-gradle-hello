@@ -1,3 +1,7 @@
+[![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Java](https://img.shields.io/badge/java-17%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+[![GitHub CI](https://github.com/gbevin/rife2-hello/actions/workflows/gradle.yml/badge.svg)](https://github.com/gbevin/rife2-hello/actions/workflows/gradle.yml)
+
 # RIFE2 bootstrap project structure
 
 This project helps you to get started with a RIFE2 web application and Gradle.
