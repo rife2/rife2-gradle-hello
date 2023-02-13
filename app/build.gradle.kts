@@ -38,7 +38,14 @@ dependencies {
 }
 
 tasks {
-    named<Test>("test") {
+    val dependencies = configurations
+        .runtimeClasspath.get().files;
+    val rifeAgentJar = dependencies
+        .filter { it.toString().contains("rife2") }
+        .filter { it.toString().endsWith("-agent.jar") }[0]
+
+    test {
+        jvmArgs = listOf("-javaagent:$rifeAgentJar")
         useJUnitPlatform()
         testLogging {
             exceptionFormat = TestExceptionFormat.FULL
@@ -71,9 +78,6 @@ tasks {
     register<JavaExec>("run") {
         classpath = sourceSets["main"].runtimeClasspath
         mainClass.set("hello.App")
-        val rifeAgentJar = configurations.runtimeClasspath.get().files
-            .filter { it.toString().contains("rife2") }
-            .filter { it.toString().endsWith("-agent.jar") }[0]
         jvmArgs = listOf("-javaagent:$rifeAgentJar")
     }
 
@@ -92,11 +96,10 @@ tasks {
         manifest {
             attributes["Main-Class"] = "hello.AppUber"
         }
-        val dependencies = configurations
-            .runtimeClasspath.get()
-            .exclude("**/rife2*-agent.jar")
+        val uberDependencies = dependencies
+            .filter { !it.toString().matches("rife2-.*agent\\.jar".toRegex()) }
             .map(::zipTree)
-        from(dependencies, "$buildDir/webapp")
+        from(uberDependencies, "$buildDir/webapp")
         with(jar.get())
     }
 }
