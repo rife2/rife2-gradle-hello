@@ -44,8 +44,21 @@ The resulting archive will be in:
 
 If you use any of the byte-code instrumented features , like continuations,
 metadata merging or lazy-loaded database entities, you'll need to launch your
-servlet container with the `-javaagent:[path-to]/rife2-*-agent.jar` argument.
-Exactly how is dependent on each servlet container.
+servlet container with the `-javaagent:[path-to]/rife2-[version]-agent.jar`
+argument. Exactly how is dependent on each servlet container.
+
+For example, for Apache Tomcat this is typically done by customizing the
+`CATALINA_OPTS` environment variable, for instance:
+
+```shell
+CATALINA_OPTS="-javaagent:[path-to]/rife2-[version]-agent.jar" ./bin/catalina.sh run
+```
+
+For Jetty, it could just be an argument of the `java` call:
+
+```shell
+java -javaagent:[path-to]/rife2-[version]-agent.jar -jar $JETTY_HOME/start.jar
+```
 
 ## Making an UberJar
 
@@ -66,7 +79,7 @@ If you use any of the byte-code instrumented features, you'll need to also tell
 For example:
 
 ```bash
-java -javaagent:[path-to]/rife2-*-agent.jar -jar app/build/libs/hello-uber-1.0.jar
+java -javaagent:[path-to]/rife2-[version]-agent.jar -jar app/build/libs/hello-uber-1.0.jar
 ```
 
 ## Get in touch
