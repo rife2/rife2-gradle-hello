@@ -2,8 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    application
+    java
 }
 
 base {
@@ -28,18 +27,14 @@ sourceSets.main {
 }
 
 dependencies {
-    implementation("com.uwyn.rife2:rife2:1.1.0")
+    implementation("com.uwyn.rife2:rife2:1.1.1")
+    runtimeOnly("com.uwyn.rife2:rife2:1.1.1:agent")
     runtimeOnly("org.eclipse.jetty:jetty-server:11.0.13")
     runtimeOnly("org.eclipse.jetty:jetty-servlet:11.0.13")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
 
     testImplementation("org.jsoup:jsoup:1.15.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
-}
-
-application {
-    // Define the main class for the application.
-    mainClass.set("hello.App")
 }
 
 tasks {
@@ -72,6 +67,16 @@ tasks {
         dependsOn("precompileTemplates")
     }
 
+    // Replace the run task with one that uses the RIFE2 agent
+    register<JavaExec>("run") {
+        classpath = sourceSets["main"].runtimeClasspath
+        mainClass.set("hello.App")
+        val rifeAgentJar = configurations.runtimeClasspath.get().files
+            .filter { it.toString().contains("rife2") }
+            .filter { it.toString().endsWith("-agent.jar") }[0]
+        jvmArgs = listOf("-javaagent:$rifeAgentJar")
+    }
+
     // These two tasks create a self-container UberJar
     register<Copy>("copyWebapp") {
         from("src/main/")
@@ -89,6 +94,7 @@ tasks {
         }
         val dependencies = configurations
             .runtimeClasspath.get()
+            .exclude("**/rife2*-agent.jar")
             .map(::zipTree)
         from(dependencies, "$buildDir/webapp")
         with(jar.get())

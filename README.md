@@ -42,6 +42,10 @@ Go to:
 The resulting archive will be in:
 `war/build/libs`
 
+If you use any of the byte-code instrumented features , like continuations,
+metadata merging or lazy-loaded database entities, you'll need to launch your
+servlet container with the `-javaagent:[path-to]/rife2-*-agent.jar` argument.
+Exactly how is dependent on each servlet container.
 
 ## Making an UberJar
 
@@ -55,3 +59,25 @@ Then run it with:
 ```bash
 java -jar app/build/libs/hello-uber-1.0.jar
 ```
+
+If you use any of the byte-code instrumented features, you'll need to also tell
+`java` to use the RIFE2 agent.
+
+For example:
+
+```bash
+java -javaagent:[path-to]/rife2-*-agent.jar -jar app/build/libs/hello-uber-1.0.jar
+```
+
+## Get in touch
+
+Thanks for using RIFE2!
+
+If you have any questions, suggestions, ideas or just want to chat, feel free
+to post on the [forums](https://github.com/gbevin/rife2/discussions), to join
+me on [Discord](https://discord.gg/DZRYPtkb6J) or to connect with me on
+[Mastodon](https://uwyn.net/@gbevin).
+
+
+**Read more in the [full documentation](https://github.com/gbevin/rife2/wiki)
+and  [RIFE2 Javadocs](https://gbevin.github.io/rife2/).**
