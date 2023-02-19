@@ -2,6 +2,10 @@
 [![Java](https://img.shields.io/badge/java-17%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![GitHub CI](https://github.com/gbevin/rife2-hello/actions/workflows/gradle.yml/badge.svg)](https://github.com/gbevin/rife2-hello/actions/workflows/gradle.yml)
 
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=AZWzYwAHDIE" target="_blank">
+ <img src="https://img.youtube.com/vi/AZWzYwAHDIE/maxresdefault.jpg" alt="Watch the video" width="640" height="360" border="0" />
+</a>
+
 # RIFE2 bootstrap project structure
 
 This project helps you to get started with a RIFE2 web application and Gradle.
