@@ -82,6 +82,33 @@ For example:
 java -javaagent:[path-to]/rife2-[version]-agent.jar -jar app/build/libs/hello-uber-1.0.jar
 ```
 
+## Making a native executable
+
+GraalVM supports creating a single Ahead-Of-Time
+[native executable](https://www.graalvm.org/native-image/) from your java
+bytecode.
+
+Once you have at least GraalVM 22.3.1 Java 19 installed, you can generate the
+UberJar as above, then create your native binary as such:
+
+```bash
+native-image --no-fallback --enable-preview -jar app/build/libs/hello-uber-1.0.jar
+```
+
+You'll end up with a `hello-uber-1.0` file that can be executed directly without
+the need of a JVM:
+
+```bash
+./hello-uber-1.0
+```
+
+> **NOTE:** RIFE2 support for GraalVM native-image is still in preliminary
+> stages. There's no solution yet to replace the features of the RIFE2 Java
+> agent, and it's only been tested in a limited context. When expanding the
+> code of the project, you most likely will have to update the native-image
+> configuration files located in `app/src/main/resources/META-INF/native-image`.
+> More information about that can be found in the [GraalVM manual](https://www.graalvm.org/latest/reference-manual/native-image/metadata/).
+
 ## Get in touch
 
 Thanks for using RIFE2!
