@@ -39,29 +39,29 @@ import java.util.stream.Collectors;
 public class Rife2Plugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
-        PluginContainer plugins = project.getPlugins();
+        var plugins = project.getPlugins();
         plugins.apply("java");
-        JavaPluginExtension javaPluginExtension = project.getExtensions().getByType(JavaPluginExtension.class);
-        Rife2Extension rife2Extension = createRife2Extension(project, javaPluginExtension);
-        ConfigurationContainer configurations = project.getConfigurations();
-        DependencyHandler dependencyHandler = project.getDependencies();
-        Configuration rife2Configuration = createRife2Configuration(configurations, dependencyHandler, rife2Extension);
-        Configuration rife2CompilerClasspath = createRife2CompilerClasspathConfiguration(configurations, rife2Configuration);
-        Configuration rife2AgentClasspath = createRife2AgentConfiguration(configurations, dependencyHandler, rife2Extension);
+        var javaPluginExtension = project.getExtensions().getByType(JavaPluginExtension.class);
+        var rife2Extension = createRife2Extension(project, javaPluginExtension);
+        var configurations = project.getConfigurations();
+        var dependencyHandler = project.getDependencies();
+        var rife2Configuration = createRife2Configuration(configurations, dependencyHandler, rife2Extension);
+        var rife2CompilerClasspath = createRife2CompilerClasspathConfiguration(configurations, rife2Configuration);
+        var rife2AgentClasspath = createRife2AgentConfiguration(configurations, dependencyHandler, rife2Extension);
         configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(rife2Configuration);
-        TaskProvider<PrecompileTemplates> precompileTemplates = registerPrecompileTemplateTask(project, rife2CompilerClasspath);
+        var precompileTemplates = registerPrecompileTemplateTask(project, rife2CompilerClasspath);
         addTemplatesToMainOutput(precompileTemplates, javaPluginExtension);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
         project.getTasks().register("uberJar", Jar.class, jar -> {
-            BasePluginExtension base = project.getExtensions().getByType(BasePluginExtension.class);
+            var base = project.getExtensions().getByType(BasePluginExtension.class);
             jar.getArchiveBaseName().convention(project.provider(() -> base.getArchivesName().get() + "-uber"));
             jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
             jar.into("webapp", spec -> spec.from("src/main/webapp"));
-            Configuration runtimeClasspath = project.getConfigurations().getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);
+            var runtimeClasspath = project.getConfigurations().getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);
             jar.from(javaPluginExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME).getOutput());
             jar.from(runtimeClasspath.getElements().map(e -> e.stream().map(project::zipTree).collect(Collectors.toList())));
             plugins.withId("application", unused -> jar.manifest(manifest ->
-                    manifest.getAttributes().put("Main-Class", rife2Extension.getUberMainClass().get()))
+                manifest.getAttributes().put("Main-Class", rife2Extension.getUberMainClass().get()))
             );
         });
     }
@@ -78,10 +78,10 @@ public class Rife2Plugin implements Plugin<Project> {
     }
 
     private static Rife2Extension createRife2Extension(Project project, JavaPluginExtension javaPluginExtension) {
-        Rife2Extension rife2 = project.getExtensions().create("rife2", Rife2Extension.class);
+        var rife2 = project.getExtensions().create("rife2", Rife2Extension.class);
         rife2.getUseAgent().convention(false);
         rife2.getUberMainClass().convention(project.getExtensions().getByType(JavaApplication.class).getMainClass()
-                .map(mainClass -> mainClass + "Uber"));
+            .map(mainClass -> mainClass + "Uber"));
         return rife2;
     }
 
@@ -102,28 +102,30 @@ public class Rife2Plugin implements Plugin<Project> {
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(true);
             conf.setTransitive(false);
-            conf.getDependencies().addLater(rife2Extension.getVersion().map(version -> dependencyHandler.create("com.uwyn.rife2:rife2:" + version + ":agent")));
+            conf.getDependencies().addLater(rife2Extension.getVersion()
+                .map(version -> dependencyHandler.create("com.uwyn.rife2:rife2:" + version + ":agent")));
         });
     }
 
     private static Configuration createRife2Configuration(ConfigurationContainer configurations,
                                                           DependencyHandler dependencyHandler,
                                                           Rife2Extension rife2Extension) {
-        Configuration config = configurations.create("rife2", conf -> {
+        var config = configurations.create("rife2", conf -> {
             conf.setDescription("The RIFE2 framework dependencies");
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(false);
         });
-        config.getDependencies().addLater(rife2Extension.getVersion().map(version -> dependencyHandler.create("com.uwyn.rife2:rife2:" + version)));
+        config.getDependencies().addLater(rife2Extension.getVersion()
+            .map(version -> dependencyHandler.create("com.uwyn.rife2:rife2:" + version)));
         return config;
     }
 
     private static void addTemplatesToMainOutput(TaskProvider<PrecompileTemplates> precompileTemplates,
                                                  JavaPluginExtension javaPluginExtension) {
         javaPluginExtension.getSourceSets()
-                .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-                .getOutput()
-                .dir(precompileTemplates);
+            .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+            .getOutput()
+            .dir(precompileTemplates);
     }
 
     private static TaskProvider<PrecompileTemplates> registerPrecompileTemplateTask(Project project,
