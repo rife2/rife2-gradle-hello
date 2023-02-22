@@ -20,6 +20,11 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
+import org.gradle.api.attributes.Attribute;
+import org.gradle.api.attributes.AttributeContainer;
+import org.gradle.api.attributes.Bundling;
+import org.gradle.api.component.AdhocComponentWithVariants;
+import org.gradle.api.component.ConfigurationVariantDetails;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.BasePluginExtension;
 import org.gradle.api.plugins.JavaApplication;
@@ -60,8 +65,34 @@ public class Rife2Plugin implements Plugin<Project> {
         createRife2DevelopmentOnlyConfiguration(project, configurations, dependencyHandler, precompileTemplates);
         exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileTemplates);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
-        registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
+        TaskProvider<Jar> uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
         bundlePrecompiledTemplatesIntoJarFile(tasks, precompileTemplates);
+        configureMavenPublishing(project, plugins, configurations, uberJarTask);
+    }
+
+    private static void configureMavenPublishing(Project project, PluginContainer plugins, ConfigurationContainer configurations, TaskProvider<Jar> uberJarTask) {
+        plugins.withId("maven-publish", unused -> {
+            Configuration rife2UberJarElements = configurations.create("rife2UberJarElements", conf -> {
+                conf.setDescription("Exposes the uber jar archive of the RIFE2 web application.");
+                conf.setCanBeResolved(false);
+                conf.setCanBeConsumed(true);
+                conf.getOutgoing().artifact(uberJarTask, artifact -> artifact.setClassifier("uber"));
+                AttributeContainer runtimeAttributes = configurations.getByName(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME).getAttributes();
+                conf.attributes(attrs -> {
+                    for (Attribute<?> attribute : runtimeAttributes.keySet()) {
+                        Object value = runtimeAttributes.getAttribute(attribute);
+                        //noinspection unchecked
+                        if (Bundling.class.equals(attribute.getType())) {
+                            attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, project.getObjects().named(Bundling.class, Bundling.SHADOWED));
+                        } else {
+                            attrs.attribute((Attribute<Object>) attribute, value);
+                        }
+                    }
+                });
+            });
+            AdhocComponentWithVariants component = (AdhocComponentWithVariants) project.getComponents().getByName("java");
+            component.addVariantsFromConfiguration(rife2UberJarElements, ConfigurationVariantDetails::mapToOptional);
+        });
     }
 
     private static void exposePrecompiledTemplatesToTestTask(Project project, ConfigurationContainer configurations, DependencyHandler dependencyHandler, TaskProvider<PrecompileTemplates> precompileTemplates) {
@@ -87,13 +118,13 @@ public class Rife2Plugin implements Plugin<Project> {
         configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME).extendsFrom(rife2DevelopmentOnly);
     }
 
-    private static void registerUberJarTask(Project project,
-                                            PluginContainer plugins,
-                                            JavaPluginExtension javaPluginExtension,
-                                            Rife2Extension rife2Extension,
-                                            TaskContainer tasks,
-                                            TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
-        tasks.register("uberJar", Jar.class, jar -> {
+    private static TaskProvider<Jar> registerUberJarTask(Project project,
+                                                         PluginContainer plugins,
+                                                         JavaPluginExtension javaPluginExtension,
+                                                         Rife2Extension rife2Extension,
+                                                         TaskContainer tasks,
+                                                         TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
+        return tasks.register("uberJar", Jar.class, jar -> {
             var base = project.getExtensions().getByType(BasePluginExtension.class);
             jar.getArchiveBaseName().convention(project.provider(() -> base.getArchivesName().get() + "-uber"));
             jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);

@@ -4,15 +4,23 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     application
     id("com.uwyn.rife2")
+    `maven-publish`
 }
 
 base {
     archivesName.set("hello")
     version = 1.0
+    group = "com.example"
 }
 
 application {
     mainClass.set("hello.App")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 repositories {
@@ -41,6 +49,20 @@ tasks {
         testLogging {
             exceptionFormat = TestExceptionFormat.FULL
             events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Build"
+            url = uri(rootProject.layout.buildDirectory.dir("repo"))
+        }
+    }
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
         }
     }
 }
