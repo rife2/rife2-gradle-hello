@@ -2,19 +2,15 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    application
     id("com.uwyn.rife2")
     `maven-publish`
 }
 
+version = 1.0
+group = "com.example"
+
 base {
     archivesName.set("hello")
-    version = 1.0
-    group = "com.example"
-}
-
-application {
-    mainClass.set("hello.App")
 }
 
 java {
@@ -30,6 +26,7 @@ repositories {
 }
 
 rife2 {
+    mainClass.set("hello.App")
     version.set("1.3.0")
     useAgent.set(true)
 }

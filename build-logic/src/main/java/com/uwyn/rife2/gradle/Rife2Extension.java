@@ -17,7 +17,10 @@ package com.uwyn.rife2.gradle;
 
 import org.gradle.api.provider.Property;
 
+@SuppressWarnings("unused")
 public abstract class Rife2Extension {
+    public abstract Property<String> getMainClass();
+
     public abstract Property<String> getVersion();
 
     public abstract Property<Boolean> getUseAgent();
