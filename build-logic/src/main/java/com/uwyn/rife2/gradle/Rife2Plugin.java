@@ -40,11 +40,9 @@ import java.util.Locale;
 
 @SuppressWarnings({"ALL", "unused"})
 public class Rife2Plugin implements Plugin<Project> {
-
     public static final String DEFAULT_TEMPLATES_DIR = "src/main/templates";
     public static final String DEFAULT_GENERATED_RIFE2_CLASSES_DIR = "generated/classes/rife2";
     public static final String RIFE2_GROUP = "rife2";
-
     public static final String WEBAPP_SRCDIR = "src/main/webapp";
 
     @Override
@@ -127,6 +125,8 @@ public class Rife2Plugin implements Plugin<Project> {
                                                          TaskContainer tasks,
                                                          TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
         return tasks.register("uberJar", Jar.class, jar -> {
+            jar.setGroup(RIFE2_GROUP);
+            jar.setDescription("Assembles the web application and all dependencies into a single jar archive.");
             var base = project.getExtensions().getByType(BasePluginExtension.class);
             jar.getArchiveBaseName().convention(project.provider(() -> base.getArchivesName().get() + "-uber"));
             jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
