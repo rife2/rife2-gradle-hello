@@ -23,7 +23,6 @@ import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
 @CacheableTask
@@ -49,9 +48,7 @@ public abstract class RunTask extends DefaultTask {
         getExecOperations().javaexec(run -> {
             run.setClasspath(getProject().getObjects().fileCollection().from(getTemplatesDirectory()).plus(getClasspath()));
             run.getMainClass().set(getMainClass());
-            List<String> args = new ArrayList<>();
-            args.add("-javaagent:" + getAgentClassPath().get());
-            run.args(args);
+            run.args(List.of("-javaagent:" + getAgentClassPath().get()));
         });
     }
 }

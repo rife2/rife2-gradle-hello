@@ -43,9 +43,9 @@ public class Rife2Plugin implements Plugin<Project> {
 
     public static final String DEFAULT_TEMPLATES_DIR = "src/main/templates";
     public static final String DEFAULT_GENERATED_RIFE2_CLASSES_DIR = "generated/classes/rife2";
-    public static final String WEBAPP_SRCDIR = "src/main/webapp";
-
     public static final String RIFE2_GROUP = "rife2";
+
+    public static final String WEBAPP_SRCDIR = "src/main/webapp";
 
     @Override
     public void apply(Project project) {
@@ -201,7 +201,7 @@ public class Rife2Plugin implements Plugin<Project> {
                                                                                     Configuration rife2CompilerClasspath) {
         return project.getTasks().register("precompileTemplates", PrecompileTemplates.class, task -> {
             task.setGroup(RIFE2_GROUP);
-            task.setDescription("Pre-compile the templates.");
+            task.setDescription("Pre-compiles the templates.");
             task.getVerbose().convention(true);
             task.getClasspath().from(rife2CompilerClasspath);
             task.getType().convention("html");
@@ -214,7 +214,7 @@ public class Rife2Plugin implements Plugin<Project> {
                                                          Configuration rife2CompilerClasspath) {
         project.getTasks().register("run", RunTask.class, task -> {
             task.setGroup(RIFE2_GROUP);
-            task.setDescription("Runs this project as an application.");
+            task.setDescription("Runs this project as a web application.");
             task.getAgentClassPath().set(rife2CompilerClasspath.getAsPath());
             task.getClasspath().from(project.getExtensions().getByType(SourceSetContainer.class)
                     .getByName(SourceSet.MAIN_SOURCE_SET_NAME).getRuntimeClasspath());
