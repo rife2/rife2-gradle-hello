@@ -47,7 +47,7 @@ public abstract class RunTask extends DefaultTask {
     public void run() {
         getExecOperations().javaexec(run -> {
             run.setClasspath(getProject().getObjects().fileCollection().from(getTemplatesDirectory()).plus(getClasspath()));
-            run.getMainClass().set(getMainClass().get());
+            run.getMainClass().set(getMainClass());
             run.args(List.of("-javaagent:" + getAgentClassPath().get()));
         });
     }
