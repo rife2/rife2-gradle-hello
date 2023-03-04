@@ -18,6 +18,7 @@ package com.uwyn.rife2.gradle;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
@@ -45,7 +46,7 @@ public abstract class PrecompileTemplates extends DefaultTask {
     public abstract DirectoryProperty getTemplatesDirectory();
 
     @Input
-    public abstract Property<String> getType();
+    public abstract ListProperty<TemplateType> getTypes();
 
     @Input
     @Optional
@@ -63,21 +64,23 @@ public abstract class PrecompileTemplates extends DefaultTask {
 
     @TaskAction
     public void precompileTemplates() {
-        getExecOperations().javaexec(javaexec -> {
-            javaexec.setClasspath(getClasspath());
-            javaexec.getMainClass().set("rife.template.TemplateDeployer");
-            List<String> args = new ArrayList<>();
-            if (getVerbose().isPresent() && Boolean.TRUE.equals(getVerbose().get())) {
-                args.add("-verbose");
-            }
-            args.add("-t");
-            args.add(getType().get());
-            args.add("-d");
-            args.add(getOutputDirectory().get().getAsFile().getPath());
-            args.add("-encoding");
-            args.add(getEncoding().orElse("UTF-8").get());
-            args.add(getTemplatesDirectory().get().getAsFile().getPath());
-            javaexec.args(args);
-        });
+        for (var type : getTypes().get()) {
+            getExecOperations().javaexec(javaexec -> {
+                javaexec.setClasspath(getClasspath());
+                javaexec.getMainClass().set("rife.template.TemplateDeployer");
+                List<String> args = new ArrayList<>();
+                if (getVerbose().isPresent() && Boolean.TRUE.equals(getVerbose().get())) {
+                    args.add("-verbose");
+                }
+                args.add("-t");
+                args.add(type.identifier());
+                args.add("-d");
+                args.add(getOutputDirectory().get().getAsFile().getPath());
+                args.add("-encoding");
+                args.add(getEncoding().orElse("UTF-8").get());
+                args.add(getTemplatesDirectory().get().getAsFile().getPath());
+                javaexec.args(args);
+            });
+        }
     }
 }

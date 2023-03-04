@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
     id("com.uwyn.rife2")
@@ -29,6 +30,7 @@ rife2 {
     mainClass.set("hello.App")
     version.set("1.4.0")
     useAgent.set(true)
+    precompiledTemplateTypes.addAll(HTML)
 }
 
 dependencies {

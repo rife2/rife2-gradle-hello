@@ -20,7 +20,6 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.attributes.Attribute;
-import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.attributes.Bundling;
 import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.ConfigurationVariantDetails;
@@ -53,17 +52,21 @@ public class Rife2Plugin implements Plugin<Project> {
         var configurations = project.getConfigurations();
         var dependencyHandler = project.getDependencies();
         var tasks = project.getTasks();
+
         var rife2Configuration = createRife2Configuration(configurations, dependencyHandler, rife2Extension);
         var rife2CompilerClasspath = createRife2CompilerClasspathConfiguration(configurations, rife2Configuration);
         var rife2AgentClasspath = createRife2AgentConfiguration(configurations, dependencyHandler, rife2Extension);
         configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(rife2Configuration);
-        var precompileHtmlTemplates = registerPrecompileHtmlTemplateTask(project, rife2CompilerClasspath);
-        createRife2DevelopmentOnlyConfiguration(project, configurations, dependencyHandler, precompileHtmlTemplates);
-        exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileHtmlTemplates);
+
+        var precompileTemplates = registerPrecompileTemplateTask(project, rife2CompilerClasspath, rife2Extension);
+        createRife2DevelopmentOnlyConfiguration(project, configurations, dependencyHandler, precompileTemplates);
+        exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileTemplates);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
         registerRunTask(project, rife2Extension, rife2AgentClasspath);
-        var uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileHtmlTemplates);
-        bundlePrecompiledTemplatesIntoJarFile(tasks, precompileHtmlTemplates);
+        var uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
+
+        bundlePrecompiledTemplatesIntoJarFile(tasks, precompileTemplates);
+
         configureMavenPublishing(project, plugins, configurations, uberJarTask);
     }
 
@@ -103,15 +106,15 @@ public class Rife2Plugin implements Plugin<Project> {
     private static void exposePrecompiledTemplatesToTestTask(Project project,
                                                              ConfigurationContainer configurations,
                                                              DependencyHandler dependencyHandler,
-                                                             TaskProvider<PrecompileTemplates> precompileTemplates) {
+                                                             TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
         configurations.getByName(JavaPlugin.TEST_RUNTIME_ONLY_CONFIGURATION_NAME)
             .getDependencies()
-            .add(dependencyHandler.create(project.files(precompileTemplates)));
+            .add(dependencyHandler.create(project.files(precompileTemplatesTask)));
     }
 
     private static void bundlePrecompiledTemplatesIntoJarFile(TaskContainer tasks,
-                                                              TaskProvider<PrecompileTemplates> precompileTemplates) {
-        tasks.named("jar", Jar.class, jar -> jar.from(precompileTemplates));
+                                                              TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
+        tasks.named("jar", Jar.class, jar -> jar.from(precompileTemplatesTask));
     }
 
     private void createRife2DevelopmentOnlyConfiguration(Project project,
@@ -210,14 +213,15 @@ public class Rife2Plugin implements Plugin<Project> {
         return config;
     }
 
-    private static TaskProvider<PrecompileTemplates> registerPrecompileHtmlTemplateTask(Project project,
-                                                                                        Configuration rife2CompilerClasspath) {
-        return project.getTasks().register("precompileHtmlTemplates", PrecompileTemplates.class, task -> {
+    private static TaskProvider<PrecompileTemplates> registerPrecompileTemplateTask(Project project,
+                                                                                    Configuration rife2CompilerClasspath,
+                                                                                    Rife2Extension rife2Extension) {
+        return project.getTasks().register("precompileTemplates", PrecompileTemplates.class, task -> {
             task.setGroup(RIFE2_GROUP);
-            task.setDescription("Pre-compiles the HTML templates.");
+            task.setDescription("Pre-compiles the templates.");
             task.getVerbose().convention(true);
             task.getClasspath().from(rife2CompilerClasspath);
-            task.getType().convention("html");
+            task.getTypes().convention(rife2Extension.getPrecompiledTemplateTypes());
             task.getTemplatesDirectory().set(project.getLayout().getProjectDirectory().dir(DEFAULT_TEMPLATES_DIR));
             task.getOutputDirectory().set(project.getLayout().getBuildDirectory().dir(DEFAULT_GENERATED_RIFE2_CLASSES_DIR));
         });
