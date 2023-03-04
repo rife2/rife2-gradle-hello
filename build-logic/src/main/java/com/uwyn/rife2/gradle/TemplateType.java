@@ -1,8 +1,11 @@
 package com.uwyn.rife2.gradle;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class TemplateType implements Serializable {
+    @Serial private static final long serialVersionUID = -2736320275307140837L;
+
     public static TemplateType HTML = new TemplateType("html");
     public static TemplateType JSON = new TemplateType("json");
     public static TemplateType SVG = new TemplateType("svg");
