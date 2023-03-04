@@ -62,7 +62,7 @@ public class Rife2Plugin implements Plugin<Project> {
         exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileHtmlTemplates);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
         registerRunTask(project, rife2Extension, rife2AgentClasspath);
-        TaskProvider<Jar> uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileHtmlTemplates);
+        var uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileHtmlTemplates);
         bundlePrecompiledTemplatesIntoJarFile(tasks, precompileHtmlTemplates);
         configureMavenPublishing(project, plugins, configurations, uberJarTask);
     }
@@ -73,12 +73,13 @@ public class Rife2Plugin implements Plugin<Project> {
                                                  ConfigurationContainer configurations,
                                                  TaskProvider<Jar> uberJarTask) {
         plugins.withId("maven-publish", unused -> {
-            Configuration rife2UberJarElements = configurations.create("rife2UberJarElements", conf -> {
+            var rife2UberJarElements = configurations.create("rife2UberJarElements", conf -> {
                 conf.setDescription("Exposes the uber jar archive of the RIFE2 web application.");
                 conf.setCanBeResolved(false);
                 conf.setCanBeConsumed(true);
                 conf.getOutgoing().artifact(uberJarTask, artifact -> artifact.setClassifier("uber"));
-                AttributeContainer runtimeAttributes = configurations.getByName(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME).getAttributes();
+
+                var runtimeAttributes = configurations.getByName(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME).getAttributes();
                 conf.attributes(attrs -> {
                     for (Attribute<?> attribute : runtimeAttributes.keySet()) {
                         Object value = runtimeAttributes.getAttribute(attribute);
@@ -93,7 +94,8 @@ public class Rife2Plugin implements Plugin<Project> {
                     }
                 });
             });
-            AdhocComponentWithVariants component = (AdhocComponentWithVariants) project.getComponents().getByName("java");
+
+            var component = (AdhocComponentWithVariants) project.getComponents().getByName("java");
             component.addVariantsFromConfiguration(rife2UberJarElements, ConfigurationVariantDetails::mapToOptional);
         });
     }
@@ -116,7 +118,7 @@ public class Rife2Plugin implements Plugin<Project> {
                                                          ConfigurationContainer configurations,
                                                          DependencyHandler dependencies,
                                                          TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
-        Configuration rife2DevelopmentOnly = configurations.create("rife2DevelopmentOnly", conf -> {
+        var rife2DevelopmentOnly = configurations.create("rife2DevelopmentOnly", conf -> {
             conf.setDescription("Dependencies which should only be visible when running the application in development mode (and not in tests).");
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(false);
@@ -137,10 +139,10 @@ public class Rife2Plugin implements Plugin<Project> {
             var base = project.getExtensions().getByType(BasePluginExtension.class);
             jar.getArchiveBaseName().convention(project.provider(() -> base.getArchivesName().get() + "-uber"));
             jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
-            var runtimeClasspath = project.getConfigurations().getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);
             jar.from(javaPluginExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME).getOutput());
             jar.from(precompileTemplatesTask);
             jar.into("webapp", spec -> spec.from(WEBAPP_SRCDIR));
+            var runtimeClasspath = project.getConfigurations().getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);
             jar.from(runtimeClasspath.getElements().map(e -> e.stream()
                 .filter(f -> f.getAsFile().getName().toLowerCase(Locale.ENGLISH).endsWith(".jar"))
                 .map(project::zipTree)
