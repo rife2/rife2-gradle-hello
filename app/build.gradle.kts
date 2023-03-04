@@ -27,7 +27,7 @@ repositories {
 
 rife2 {
     mainClass.set("hello.App")
-    version.set("1.3.0")
+    version.set("1.4.0")
     useAgent.set(true)
 }
 
