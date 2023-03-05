@@ -19,14 +19,45 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
+/**
+ * The Gradle RIFE2 extension
+ */
 public abstract class Rife2Extension {
+    /**
+     * The RIFE2 version that should be used by the project.
+     *
+     * @return the RIFE2 version as a string
+     */
     public abstract Property<String> getVersion();
 
+    /**
+     * Indicates whether the project should be launched with the RIFE2 agent or not.
+     *
+     * @return {@code true} when the project should be launched with the RIFE2 agent;
+     * {@code false} otherwise
+     */
     public abstract Property<Boolean> getUseAgent();
 
+    /**
+     * Specifies the main Java class to use when building the uber jar.
+     *
+     * @return the fully qualified name of the main class to use when launching the uber jar.
+     */
     public abstract Property<String> getUberMainClass();
 
+    /**
+     * Specifies the template types that should be precompiled.
+     * By default, none are precompiled.
+     *
+     * @return a list of template types to precompile
+     */
     public abstract ListProperty<TemplateType> getPrecompiledTemplateTypes();
 
+    /**
+     * Specifies the directories where the template files can be found.
+     * By default, this includes {@code "src/main/resources/templates"}.
+     *
+     * @return the collection of directories to look for template files
+     */
     public abstract ConfigurableFileCollection getTemplateDirectories();
 }

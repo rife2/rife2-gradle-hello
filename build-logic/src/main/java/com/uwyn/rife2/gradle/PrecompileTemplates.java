@@ -36,33 +36,65 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Gradle task to pre-compile RIFE2 templates
+ */
 @CacheableTask
 public abstract class PrecompileTemplates extends DefaultTask {
-
-    @Classpath
-    public abstract ConfigurableFileCollection getClasspath();
-
+    /**
+     * The directories where template files can be found.
+     *
+     * @return the directories with template files
+     */
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
     public abstract ConfigurableFileCollection getTemplatesDirectories();
 
+    /**
+     * The template types to pre-compile.
+     *
+     * @return a list of template types
+     */
     @Input
     public abstract ListProperty<TemplateType> getTypes();
 
+    /**
+     * The encoding to use when reading the template files.
+     * Defaults to {@code UTF-8}.
+     *
+     * @return the encoding of the template files
+     */
     @Input
     @Optional
     public abstract Property<String> getEncoding();
 
+    /**
+     * Indicates whether the pre-compilation should be verbose or not.
+     *
+     * @return {@code true} when the pre-compilation should be verbose; or
+     * {@code false} otherwise
+     */
     @Input
     @Optional
     public abstract Property<Boolean> getVerbose();
 
+    /**
+     * Provides the directory into which pre-compiled template class files should be stored.
+     *
+     * @return the output directory for the template pre-compilation
+     */
     @OutputDirectory
     public abstract DirectoryProperty getOutputDirectory();
+
+    @Classpath
+    public abstract ConfigurableFileCollection getClasspath();
 
     @Inject
     protected abstract ExecOperations getExecOperations();
 
+    /**
+     * Perform the template pre-compilation
+     */
     @TaskAction
     public void precompileTemplates() {
         for (var type : getTypes().get()) {
