@@ -174,7 +174,6 @@ public class Rife2Plugin implements Plugin<Project> {
         rife2.getUseAgent().convention(false);
         rife2.getUberMainClass().convention(project.getExtensions().getByType(JavaApplication.class).getMainClass()
             .map(mainClass -> mainClass + "Uber"));
-        rife2.getPrecompiledTemplateTypes().convention(Collections.singletonList(TemplateType.HTML));
         return rife2;
     }
 

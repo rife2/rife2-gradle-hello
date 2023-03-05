@@ -33,6 +33,7 @@ repositories {
 rife2 {
     version.set("1.4.0")
     useAgent.set(true)
+    precompiledTemplateTypes.add(HTML)
 }
 
 dependencies {

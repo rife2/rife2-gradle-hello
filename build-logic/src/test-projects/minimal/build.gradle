@@ -1,4 +1,4 @@
-import com.uwyn.rife2.gradle.TemplateType.*
+import com.uwyn.rife2.gradle.TemplateType
 
 plugins {
     id("application")
@@ -28,6 +28,7 @@ repositories {
 rife2 {
     version = "1.4.0"
     useAgent = true
+    precompiledTemplateTypes.add(TemplateType.HTML)
 }
 
 dependencies {
