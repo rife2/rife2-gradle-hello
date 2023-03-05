@@ -92,18 +92,23 @@ GraalVM supports creating a single Ahead-Of-Time
 [native executable](https://www.graalvm.org/native-image/) from your java
 bytecode.
 
-Once you have at least GraalVM 22.3.1 Java 19 installed, you can generate the
-UberJar as above, then create your native binary as such:
+Once you have at least GraalVM 22.3.1 Java 17 installed, you can generate the native binary with:
 
 ```bash
-native-image --no-fallback --enable-preview -jar app/build/libs/hello-uber-1.0.jar
+./gradlew nativeCompile
 ```
 
-You'll end up with a `hello-uber-1.0` file that can be executed directly without
+You'll end up with a `hello-1.0` file that can be executed directly without
 the need of a JVM:
 
 ```bash
-./hello-uber-1.0
+./app/build/native/nativeCompile/hello-1.0
+```
+
+Alternatively, you can run the native executable directly with:
+
+```bash
+./gradlew nativeRun
 ```
 
 > **NOTE:** RIFE2 support for GraalVM native-image is still in preliminary
