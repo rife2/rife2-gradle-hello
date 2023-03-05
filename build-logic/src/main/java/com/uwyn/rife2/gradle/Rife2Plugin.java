@@ -24,6 +24,7 @@ import org.gradle.api.attributes.Attribute;
 import org.gradle.api.attributes.Bundling;
 import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.ConfigurationVariantDetails;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.BasePluginExtension;
 import org.gradle.api.plugins.JavaApplication;
@@ -41,6 +42,7 @@ import org.gradle.process.CommandLineArgumentProvider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class Rife2Plugin implements Plugin<Project> {
     public static final List<String> DEFAULT_TEMPLATES_DIRS = List.of("src/main/resources/templates", "src/main/templates");
@@ -65,7 +67,7 @@ public class Rife2Plugin implements Plugin<Project> {
         configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(rife2Configuration);
 
         var precompileTemplates = registerPrecompileTemplateTask(project, rife2CompilerClasspath, rife2Extension);
-        createRife2DevelopmentOnlyConfiguration(project, configurations, dependencyHandler);
+        createRife2DevelopmentOnlyConfiguration(project, configurations, dependencyHandler, rife2Extension.getTemplateDirectories());
         exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileTemplates);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
         TaskProvider<Jar> uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
@@ -128,13 +130,16 @@ public class Rife2Plugin implements Plugin<Project> {
 
     private void createRife2DevelopmentOnlyConfiguration(Project project,
                                                          ConfigurationContainer configurations,
-                                                         DependencyHandler dependencies) {
+                                                         DependencyHandler dependencies,
+                                                         ConfigurableFileCollection templateDirectories) {
         var rife2DevelopmentOnly = configurations.create("rife2DevelopmentOnly", conf -> {
             conf.setDescription("Dependencies which should only be visible when running the application in development mode (and not in tests).");
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(false);
         });
-        DEFAULT_TEMPLATES_DIRS.stream().forEachOrdered(dir -> rife2DevelopmentOnly.getDependencies().add(dependencies.create(project.files(dir))));
+        rife2DevelopmentOnly.getDependencies().addAllLater(templateDirectories.getElements().map(locations ->
+                locations.stream().map(fs -> dependencies.create(project.files(fs))).collect(Collectors.toList()))
+        );
         configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME).extendsFrom(rife2DevelopmentOnly);
     }
 
@@ -188,6 +193,7 @@ public class Rife2Plugin implements Plugin<Project> {
         rife2.getUseAgent().convention(false);
         rife2.getUberMainClass().convention(project.getExtensions().getByType(JavaApplication.class).getMainClass()
             .map(mainClass -> mainClass + "Uber"));
+        DEFAULT_TEMPLATES_DIRS.stream().forEachOrdered(dir -> rife2.getTemplateDirectories().from(project.files(dir)));
         return rife2;
     }
 
@@ -236,7 +242,7 @@ public class Rife2Plugin implements Plugin<Project> {
             task.getVerbose().convention(true);
             task.getClasspath().from(rife2CompilerClasspath);
             task.getTypes().convention(rife2Extension.getPrecompiledTemplateTypes());
-            DEFAULT_TEMPLATES_DIRS.stream().forEachOrdered(dir -> task.getTemplatesDirectories().from(project.getLayout().getProjectDirectory().dir(dir)));
+            task.getTemplatesDirectories().from(rife2Extension.getTemplateDirectories());
             task.getOutputDirectory().set(project.getLayout().getBuildDirectory().dir(DEFAULT_GENERATED_RIFE2_CLASSES_DIR));
         });
     }
