@@ -29,6 +29,7 @@ rife2 {
     version = "1.4.0"
     useAgent = true
     precompiledTemplateTypes.add(TemplateType.HTML)
+    templateDirectories.from(file("src/main/templates"))
 }
 
 dependencies {

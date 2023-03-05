@@ -45,7 +45,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class Rife2Plugin implements Plugin<Project> {
-    public static final List<String> DEFAULT_TEMPLATES_DIRS = List.of("src/main/resources/templates", "src/main/templates");
+    public static final List<String> DEFAULT_TEMPLATES_DIRS = List.of("src/main/resources/templates");
     public static final String DEFAULT_GENERATED_RIFE2_CLASSES_DIR = "generated/classes/rife2";
     public static final String RIFE2_GROUP = "rife2";
     public static final String WEBAPP_SRCDIR = "src/main/webapp";
@@ -71,7 +71,7 @@ public class Rife2Plugin implements Plugin<Project> {
         exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileTemplates);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
         TaskProvider<Jar> uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
-        bundlePrecompiledTemplatesIntoJarFile(tasks, precompileTemplates);
+        bundlePrecompiledTemplatesIntoJarFile(tasks, precompileTemplates, rife2Extension);
 
         configureMavenPublishing(project, plugins, configurations, uberJarTask);
     }
@@ -117,14 +117,16 @@ public class Rife2Plugin implements Plugin<Project> {
     }
 
     private static void bundlePrecompiledTemplatesIntoJarFile(TaskContainer tasks,
-                                                              TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
+                                                              TaskProvider<PrecompileTemplates> precompileTemplatesTask,
+                                                              Rife2Extension rife2Extension) {
         tasks.named("jar", Jar.class, jar -> {
             jar.from(precompileTemplatesTask);
             // This isn't great because it needs to be hardcoded, in order to avoid the templates
             // declared in `src/main/resources/templates` to be included in the jar file.
             // which means that if for whatever reason the user also uses the same directory for
             // something else, it will be excluded from the jar file.
-            jar.exclude("templates");
+            rife2Extension.getPrecompiledTemplateTypes().get().forEach(templateType -> jar.exclude("/templates/**." + templateType.identifier().toLowerCase())
+            );
         });
     }
 
