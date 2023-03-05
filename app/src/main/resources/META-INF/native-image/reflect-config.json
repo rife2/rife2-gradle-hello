@@ -2,9 +2,5 @@
   {
       "name":"rife.template.html.hello",
       "methods":[{"name":"<init>","parameterTypes":[] }]
-  },
-  {
-    "name":"rife.template.html.world",
-    "methods":[{"name":"<init>","parameterTypes":[] }]
   }
 ]

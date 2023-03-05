@@ -71,5 +71,6 @@ publishing {
 }
 
 graalvmNative.binaries.all {
+    buildArgs.add("--enable-preview") // support for Jetty virtual threads with JDK 19
     imageName.set("hello-$version")
 }
