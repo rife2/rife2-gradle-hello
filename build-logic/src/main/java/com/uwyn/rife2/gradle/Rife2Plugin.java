@@ -15,7 +15,8 @@
  */
 package com.uwyn.rife2.gradle;
 
-import org.gradle.api.*;
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
@@ -38,10 +39,11 @@ import org.gradle.api.tasks.testing.Test;
 import org.gradle.process.CommandLineArgumentProvider;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 public class Rife2Plugin implements Plugin<Project> {
-    public static final String DEFAULT_TEMPLATES_DIR = "src/main/templates";
+    public static final List<String> DEFAULT_TEMPLATES_DIRS = List.of("src/main/resources/templates", "src/main/templates");
     public static final String DEFAULT_GENERATED_RIFE2_CLASSES_DIR = "generated/classes/rife2";
     public static final String RIFE2_GROUP = "rife2";
     public static final String WEBAPP_SRCDIR = "src/main/webapp";
@@ -114,7 +116,14 @@ public class Rife2Plugin implements Plugin<Project> {
 
     private static void bundlePrecompiledTemplatesIntoJarFile(TaskContainer tasks,
                                                               TaskProvider<PrecompileTemplates> precompileTemplatesTask) {
-        tasks.named("jar", Jar.class, jar -> jar.from(precompileTemplatesTask));
+        tasks.named("jar", Jar.class, jar -> {
+            jar.from(precompileTemplatesTask);
+            // This isn't great because it needs to be hardcoded, in order to avoid the templates
+            // declared in `src/main/resources/templates` to be included in the jar file.
+            // which means that if for whatever reason the user also uses the same directory for
+            // something else, it will be excluded from the jar file.
+            jar.exclude("templates");
+        });
     }
 
     private void createRife2DevelopmentOnlyConfiguration(Project project,
@@ -125,7 +134,7 @@ public class Rife2Plugin implements Plugin<Project> {
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(false);
         });
-        rife2DevelopmentOnly.getDependencies().add(dependencies.create(project.files(DEFAULT_TEMPLATES_DIR)));
+        DEFAULT_TEMPLATES_DIRS.stream().forEachOrdered(dir -> rife2DevelopmentOnly.getDependencies().add(dependencies.create(project.files(dir))));
         configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME).extendsFrom(rife2DevelopmentOnly);
     }
 
@@ -149,6 +158,11 @@ public class Rife2Plugin implements Plugin<Project> {
                 .filter(f -> f.getAsFile().getName().toLowerCase(Locale.ENGLISH).endsWith(".jar"))
                 .map(project::zipTree)
                 .toList()));
+            // This isn't great because it needs to be hardcoded, in order to avoid the templates
+            // declared in `src/main/resources/templates` to be included in the jar file.
+            // which means that if for whatever reason the user also uses the same directory for
+            // something else, it will be excluded from the jar file.
+            jar.exclude("templates");
             plugins.withId("application", unused -> jar.manifest(manifest ->
                 manifest.getAttributes().put("Main-Class", rife2Extension.getUberMainClass().get()))
             );
@@ -223,7 +237,7 @@ public class Rife2Plugin implements Plugin<Project> {
             task.getVerbose().convention(true);
             task.getClasspath().from(rife2CompilerClasspath);
             task.getTypes().convention(rife2Extension.getPrecompiledTemplateTypes());
-            task.getTemplatesDirectory().set(project.getLayout().getProjectDirectory().dir(DEFAULT_TEMPLATES_DIR));
+            DEFAULT_TEMPLATES_DIRS.stream().forEachOrdered(dir -> task.getTemplatesDirectories().from(project.getLayout().getProjectDirectory().dir(dir)));
             task.getOutputDirectory().set(project.getLayout().getBuildDirectory().dir(DEFAULT_GENERATED_RIFE2_CLASSES_DIR));
         });
     }
