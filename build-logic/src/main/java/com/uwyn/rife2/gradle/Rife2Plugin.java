@@ -125,8 +125,8 @@ public class Rife2Plugin implements Plugin<Project> {
             // declared in `src/main/resources/templates` to be included in the jar file.
             // which means that if for whatever reason the user also uses the same directory for
             // something else, it will be excluded from the jar file.
-            rife2Extension.getPrecompiledTemplateTypes().get().forEach(templateType -> jar.exclude("/templates/**." + templateType.identifier().toLowerCase())
-            );
+            rife2Extension.getPrecompiledTemplateTypes().get().forEach(templateType ->
+                jar.exclude("/templates/**." + templateType.identifier().toLowerCase()));
         });
     }
 
