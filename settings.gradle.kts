@@ -1,9 +1,9 @@
 pluginManagement {
     repositories {
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
-    includeBuild("build-logic")
 }
 
 rootProject.name = "hello"
