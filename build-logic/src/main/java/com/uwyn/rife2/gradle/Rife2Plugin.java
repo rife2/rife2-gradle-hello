@@ -121,10 +121,8 @@ public class Rife2Plugin implements Plugin<Project> {
                                                               Rife2Extension rife2Extension) {
         tasks.named("jar", Jar.class, jar -> {
             jar.from(precompileTemplatesTask);
-            // This isn't great because it needs to be hardcoded, in order to avoid the templates
+            // This isn't great because it needs to be partially hardcoded, in order to avoid the templates
             // declared in `src/main/resources/templates` to be included in the jar file.
-            // which means that if for whatever reason the user also uses the same directory for
-            // something else, it will be excluded from the jar file.
             rife2Extension.getPrecompiledTemplateTypes().get().forEach(templateType ->
                 jar.exclude("/templates/**." + templateType.identifier().toLowerCase()));
         });
