@@ -6,6 +6,7 @@ plugins {
     application
     id("com.uwyn.rife2")
     `maven-publish`
+    id("org.graalvm.buildtools.native") version "0.9.20"
 }
 
 base {
@@ -67,4 +68,8 @@ publishing {
             from(components["java"])
         }
     }
+}
+
+graalvmNative.binaries.all {
+    imageName.set("hello-$version")
 }
