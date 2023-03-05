@@ -25,6 +25,9 @@ class PackagingTest extends AbstractFunctionalTest {
                 }
             }
             assert Files.exists(fs.getPath("/rife/template/html/hello.class"))
+            assert Files.exists(fs.getPath("/rife/template/html/world.class"))
+            assert !Files.exists(fs.getPath("/templates/hello.html"))
+            assert !Files.exists(fs.getPath("/templates/world.html"))
         }
 
         where:

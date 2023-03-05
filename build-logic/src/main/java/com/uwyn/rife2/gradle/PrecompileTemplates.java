@@ -23,7 +23,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.PathSensitive;
@@ -32,6 +32,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +42,9 @@ public abstract class PrecompileTemplates extends DefaultTask {
     @Classpath
     public abstract ConfigurableFileCollection getClasspath();
 
-    @InputDirectory
+    @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
-    public abstract DirectoryProperty getTemplatesDirectory();
+    public abstract ConfigurableFileCollection getTemplatesDirectories();
 
     @Input
     public abstract ListProperty<TemplateType> getTypes();
@@ -65,22 +66,27 @@ public abstract class PrecompileTemplates extends DefaultTask {
     @TaskAction
     public void precompileTemplates() {
         for (var type : getTypes().get()) {
-            getExecOperations().javaexec(javaexec -> {
-                javaexec.setClasspath(getClasspath());
-                javaexec.getMainClass().set("rife.template.TemplateDeployer");
-                List<String> args = new ArrayList<>();
-                if (getVerbose().isPresent() && Boolean.TRUE.equals(getVerbose().get())) {
-                    args.add("-verbose");
+            getTemplatesDirectories().getFiles().forEach(dir -> {
+                if (Files.exists(dir.toPath())) {
+                    getExecOperations().javaexec(javaexec -> {
+                        javaexec.setClasspath(getClasspath());
+                        javaexec.getMainClass().set("rife.template.TemplateDeployer");
+                        List<String> args = new ArrayList<>();
+                        if (getVerbose().isPresent() && Boolean.TRUE.equals(getVerbose().get())) {
+                            args.add("-verbose");
+                        }
+                        args.add("-t");
+                        args.add(type.identifier());
+                        args.add("-d");
+                        args.add(getOutputDirectory().get().getAsFile().getPath());
+                        args.add("-encoding");
+                        args.add(getEncoding().orElse("UTF-8").get());
+                        args.add(dir.getPath());
+                        javaexec.args(args);
+                    });
                 }
-                args.add("-t");
-                args.add(type.identifier());
-                args.add("-d");
-                args.add(getOutputDirectory().get().getAsFile().getPath());
-                args.add("-encoding");
-                args.add(getEncoding().orElse("UTF-8").get());
-                args.add(getTemplatesDirectory().get().getAsFile().getPath());
-                javaexec.args(args);
             });
+
         }
     }
 }

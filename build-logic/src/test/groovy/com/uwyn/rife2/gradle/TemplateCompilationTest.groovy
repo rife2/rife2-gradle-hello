@@ -42,6 +42,7 @@ class TemplateCompilationTest extends AbstractFunctionalTest {
 
         then: "template sources must be present in the classpath"
         outputContains("Classpath entry: src/main/templates")
+        outputContains("Classpath entry: src/main/resources/templates")
     }
 
     def "compiles templates when running #task"() {
