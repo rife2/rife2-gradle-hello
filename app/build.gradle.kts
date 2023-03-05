@@ -37,11 +37,12 @@ rife2 {
 }
 
 dependencies {
-    runtimeOnly(libs.bundles.jetty)
-    runtimeOnly(libs.slf4j.simple)
+    runtimeOnly("org.eclipse.jetty:jetty-server:11.0.13")
+    runtimeOnly("org.eclipse.jetty:jetty-servlet:11.0.13")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
 
-    testImplementation(libs.jsoup)
-    testImplementation(libs.junit.jupiter)
+    testImplementation("org.jsoup:jsoup:1.15.3")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
 }
 
 tasks {
