@@ -1,0 +1,17 @@
+[versions]
+jetty = "11.0.13"
+jsoup = "1.15.3"
+junit-jupiter = "5.9.1"
+slf4j = "2.0.5"
+spock = "2.3-groovy-3.0"
+
+[libraries]
+jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty" }
+jetty-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+spock-core = { module = "org.spockframework:spock-core", version.ref = "spock" }
+
+[bundles]
+jetty = [ "jetty-server", "jetty-servlet" ]
