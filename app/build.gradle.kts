@@ -3,15 +3,19 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
+    application
     id("com.uwyn.rife2")
     `maven-publish`
 }
 
-version = 1.0
-group = "com.example"
-
 base {
     archivesName.set("hello")
+    version = 1.0
+    group = "com.example"
+}
+
+application {
+    mainClass.set("hello.App")
 }
 
 java {
@@ -27,19 +31,16 @@ repositories {
 }
 
 rife2 {
-    mainClass.set("hello.App")
     version.set("1.4.0")
     useAgent.set(true)
-    precompiledTemplateTypes.addAll(HTML)
 }
 
 dependencies {
-    runtimeOnly("org.eclipse.jetty:jetty-server:11.0.13")
-    runtimeOnly("org.eclipse.jetty:jetty-servlet:11.0.13")
-    runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
+    runtimeOnly(libs.bundles.jetty)
+    runtimeOnly(libs.slf4j.simple)
 
-    testImplementation("org.jsoup:jsoup:1.15.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+    testImplementation(libs.jsoup)
+    testImplementation(libs.junit.jupiter)
 }
 
 tasks {
