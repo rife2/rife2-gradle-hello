@@ -29,8 +29,9 @@ class TemplateCompilationTest extends AbstractFunctionalTest {
         buildFile << """
             tasks.register("dumpRunClasspath") {
                 doLast {
+                    def rootPath = rootProject.projectDir.toPath()
                     tasks.named("run").get().classpath.files.each {
-                        println "Classpath entry: \$it"
+                        println "Classpath entry: \${rootPath.relativize(it.toPath())}"
                     }
                 }   
             }
@@ -40,7 +41,7 @@ class TemplateCompilationTest extends AbstractFunctionalTest {
         run("dumpRunClasspath")
 
         then: "template sources must be present in the classpath"
-        outputContains("Classpath entry: ${file("src/main/templates").absolutePath}")
+        outputContains("Classpath entry: src/main/templates")
     }
 
     def "compiles templates when running #task"() {
