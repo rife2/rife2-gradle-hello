@@ -4,7 +4,7 @@ import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
     application
-    id("com.uwyn.rife2") version "1.0.0"
+    id("com.uwyn.rife2") version "1.0.1"
     `maven-publish`
     id("org.graalvm.buildtools.native") version "0.9.20"
 }
