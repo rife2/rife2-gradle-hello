@@ -25,10 +25,14 @@ import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.ConfigurationVariantDetails;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.BasePluginExtension;
+import org.gradle.api.plugins.JavaApplication;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.plugins.PluginContainer;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.process.CommandLineArgumentProvider;
@@ -36,7 +40,6 @@ import org.gradle.process.CommandLineArgumentProvider;
 import java.util.Collections;
 import java.util.Locale;
 
-@SuppressWarnings({"ALL", "unused"})
 public class Rife2Plugin implements Plugin<Project> {
     public static final String DEFAULT_TEMPLATES_DIR = "src/main/templates";
     public static final String DEFAULT_GENERATED_RIFE2_CLASSES_DIR = "generated/classes/rife2";
@@ -62,9 +65,7 @@ public class Rife2Plugin implements Plugin<Project> {
         createRife2DevelopmentOnlyConfiguration(project, configurations, dependencyHandler, precompileTemplates);
         exposePrecompiledTemplatesToTestTask(project, configurations, dependencyHandler, precompileTemplates);
         configureAgent(project, plugins, rife2Extension, rife2AgentClasspath);
-        registerRunTask(project, rife2Extension, rife2AgentClasspath);
-        var uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
-
+        TaskProvider<Jar> uberJarTask = registerUberJarTask(project, plugins, javaPluginExtension, rife2Extension, tasks, precompileTemplates);
         bundlePrecompiledTemplatesIntoJarFile(tasks, precompileTemplates);
 
         configureMavenPublishing(project, plugins, configurations, uberJarTask);
@@ -86,13 +87,11 @@ public class Rife2Plugin implements Plugin<Project> {
                 conf.attributes(attrs -> {
                     for (Attribute<?> attribute : runtimeAttributes.keySet()) {
                         Object value = runtimeAttributes.getAttribute(attribute);
-                        if (value != null) {
-                            if (Bundling.class.equals(attribute.getType())) {
-                                attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, project.getObjects().named(Bundling.class, Bundling.SHADOWED));
-                            } else {
-                                //noinspection unchecked
-                                attrs.attribute((Attribute<Object>) attribute, value);
-                            }
+                        //noinspection unchecked
+                        if (Bundling.class.equals(attribute.getType())) {
+                            attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, project.getObjects().named(Bundling.class, Bundling.SHADOWED));
+                        } else {
+                            attrs.attribute((Attribute<Object>) attribute, value);
                         }
                     }
                 });
@@ -173,7 +172,8 @@ public class Rife2Plugin implements Plugin<Project> {
     private static Rife2Extension createRife2Extension(Project project) {
         var rife2 = project.getExtensions().create("rife2", Rife2Extension.class);
         rife2.getUseAgent().convention(false);
-        rife2.getUberMainClass().set(rife2.getMainClass() + "Uber");
+        rife2.getUberMainClass().convention(project.getExtensions().getByType(JavaApplication.class).getMainClass()
+            .map(mainClass -> mainClass + "Uber"));
         return rife2;
     }
 
@@ -224,20 +224,6 @@ public class Rife2Plugin implements Plugin<Project> {
             task.getTypes().convention(rife2Extension.getPrecompiledTemplateTypes());
             task.getTemplatesDirectory().set(project.getLayout().getProjectDirectory().dir(DEFAULT_TEMPLATES_DIR));
             task.getOutputDirectory().set(project.getLayout().getBuildDirectory().dir(DEFAULT_GENERATED_RIFE2_CLASSES_DIR));
-        });
-    }
-
-    private static void registerRunTask(Project project,
-                                        Rife2Extension rife2Extension,
-                                        Configuration rife2CompilerClasspath) {
-        project.getTasks().register("run", RunTask.class, task -> {
-            task.setGroup(RIFE2_GROUP);
-            task.setDescription("Runs this project as a web application.");
-            task.getAgentClassPath().set(rife2CompilerClasspath.getAsPath());
-            task.getClasspath().from(project.getExtensions().getByType(SourceSetContainer.class)
-                .getByName(SourceSet.MAIN_SOURCE_SET_NAME).getRuntimeClasspath());
-            task.getMainClass().set(rife2Extension.getMainClass());
-            task.getTemplatesDirectory().set(project.getLayout().getProjectDirectory().dir(DEFAULT_TEMPLATES_DIR));
         });
     }
 }
