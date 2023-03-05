@@ -15,6 +15,7 @@
  */
 package com.uwyn.rife2.gradle;
 
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
@@ -26,4 +27,6 @@ public abstract class Rife2Extension {
     public abstract Property<String> getUberMainClass();
 
     public abstract ListProperty<TemplateType> getPrecompiledTemplateTypes();
+
+    public abstract ConfigurableFileCollection getTemplateDirectories();
 }
