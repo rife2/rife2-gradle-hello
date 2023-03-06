@@ -4,7 +4,7 @@ import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
     application
-    id("com.uwyn.rife2") version "1.0.2"
+    id("com.uwyn.rife2") version "1.0.3"
     `maven-publish`
     id("org.graalvm.buildtools.native") version "0.9.20"
 }
@@ -38,10 +38,6 @@ rife2 {
 }
 
 dependencies {
-    runtimeOnly("org.eclipse.jetty:jetty-server:11.0.13")
-    runtimeOnly("org.eclipse.jetty:jetty-servlet:11.0.13")
-    runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
-
     testImplementation("org.jsoup:jsoup:1.15.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
 }
