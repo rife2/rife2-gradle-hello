@@ -9,14 +9,16 @@ plugins {
     id("org.graalvm.buildtools.native") version "0.9.20"
 }
 
+rife2 {
+    version.set("1.4.0")
+    useAgent.set(true)
+    precompiledTemplateTypes.add(HTML)
+}
+
 base {
     archivesName.set("hello")
     version = 1.0
     group = "com.example"
-}
-
-application {
-    mainClass.set("hello.App")
 }
 
 java {
@@ -31,15 +33,13 @@ repositories {
     maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots") } // only needed for SNAPSHOT
 }
 
-rife2 {
-    version.set("1.4.0")
-    useAgent.set(true)
-    precompiledTemplateTypes.add(HTML)
-}
-
 dependencies {
     testImplementation("org.jsoup:jsoup:1.15.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+}
+
+application {
+    mainClass.set("hello.App")
 }
 
 tasks {
