@@ -4,13 +4,14 @@ import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
     application
-    id("com.uwyn.rife2") version "1.0.4"
+    id("com.uwyn.rife2") version "1.0.5"
     `maven-publish`
     id("org.graalvm.buildtools.native") version "0.9.20"
 }
 
 rife2 {
     version.set("1.4.0")
+    uberMainClass.set("hello.AppUber")
     useAgent.set(true)
     precompiledTemplateTypes.add(HTML)
 }
