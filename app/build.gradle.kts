@@ -9,6 +9,9 @@ plugins {
     id("org.graalvm.buildtools.native") version "0.9.20"
 }
 
+version = 1.0
+group = "com.example"
+
 rife2 {
     version.set("1.4.0")
     uberMainClass.set("hello.AppUber")
@@ -18,8 +21,6 @@ rife2 {
 
 base {
     archivesName.set("hello")
-    version = 1.0
-    group = "com.example"
 }
 
 java {
