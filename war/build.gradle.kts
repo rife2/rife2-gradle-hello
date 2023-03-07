@@ -2,9 +2,10 @@ plugins {
     war
 }
 
+version = 1.0
+
 base {
     archivesName.set("hello")
-    version = 1.0
 }
 
 repositories {
