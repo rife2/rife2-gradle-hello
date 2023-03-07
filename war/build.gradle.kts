@@ -19,5 +19,4 @@ dependencies {
 tasks.war {
     webAppDirectory.set(file("../app/src/main/webapp"))
     webXml = file("src/web.xml")
-    rootSpec.exclude("**/jetty*.jar", "**/slf4j*.jar", "**/rife2*-agent.jar")
 }
