@@ -63,6 +63,7 @@ publishing {
     }
     publications {
         create<MavenPublication>("maven") {
+            artifactId = rootProject.name
             from(components["java"])
         }
     }
