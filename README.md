@@ -68,7 +68,7 @@ java -javaagent:[path-to]/rife2-[version]-agent.jar -jar $JETTY_HOME/start.jar
 
 
 ```bash
-./gradlew clean uberJar
+./gradlew clean uberjar
 ```
 
 Then run it with:
