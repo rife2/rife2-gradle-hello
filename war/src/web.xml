@@ -7,7 +7,7 @@
         <filter-class>rife.servlet.RifeFilter</filter-class>
         <init-param>
             <param-name>rifeSiteClass</param-name>
-            <param-value>hello.App</param-value>
+            <param-value>hello.AppSite</param-value>
         </init-param>
     </filter>
 

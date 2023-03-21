@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppTest {
     @Test
     void verifyRoot() {
-        var m = new MockConversation(new App());
+        var m = new MockConversation(new AppSite());
         assertEquals(m.doRequest("/").getStatus(), 302);
     }
 
     @Test
     void verifyHello() {
-        var m = new MockConversation(new App());
+        var m = new MockConversation(new AppSite());
         assertEquals("Hello", m.doRequest("/hello")
             .getTemplate().getValue("title"));
     }

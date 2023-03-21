@@ -4,7 +4,7 @@ import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
     application
-    id("com.uwyn.rife2") version "1.0.7"
+    id("com.uwyn.rife2") version "1.0.8"
     `maven-publish`
     id("org.graalvm.buildtools.native") version "0.9.20"
 }
@@ -13,8 +13,8 @@ version = 1.0
 group = "com.example"
 
 rife2 {
-    version.set("1.4.0")
-    uberMainClass.set("hello.AppUber")
+    version.set("1.5.4")
+    uberMainClass.set("hello.AppSiteUber")
     useAgent.set(true)
     precompiledTemplateTypes.add(HTML)
 }
@@ -36,12 +36,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.jsoup:jsoup:1.15.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+    testImplementation("org.jsoup:jsoup:1.15.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
 
 application {
-    mainClass.set("hello.App")
+    mainClass.set("hello.AppSite")
 }
 
 tasks {
