@@ -13,7 +13,7 @@ version = 1.0
 group = "com.example"
 
 rife2 {
-    version.set("1.5.9")
+    version.set("1.5.11")
     uberMainClass.set("hello.AppSiteUber")
     useAgent.set(true)
     precompiledTemplateTypes.add(HTML)
