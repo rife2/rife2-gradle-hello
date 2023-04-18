@@ -20,13 +20,17 @@ in a very iterative, intuitive and rewarding way.
 For all things RIFE2, head on to the project website:
 [https://rife2.com](https://rife2.com)
 
+Alternatively, also check out our `bld` build system that allows you to write your build logic in pure Java:
+[https://rife2.com/bld](https://rife2.com/bld). We also provide a bootstap project structure for `bld` in this
+repository: [https://github.com/rife2/rife2-bld-hello](https://github.com/rife2/rife2-bld-hello)
+
 ## Run the tests
 
 ```bash
 ./gradlew clean test
 ```
 
-## Running the server
+## Run the server
 
 ```bash
 ./gradlew clean run
@@ -37,7 +41,7 @@ Go to:
 [http://localhost:8080/](http://localhost:8080/)
 
 
-## Deploying the app
+## Deploy the app
 
 ```bash
 ./gradlew clean war
@@ -64,7 +68,7 @@ For Jetty, it could just be an argument of the `java` call:
 java -javaagent:[path-to]/rife2-[version]-agent.jar -jar $JETTY_HOME/start.jar
 ```
 
-## Making an UberJar
+## Make an UberJar
 
 
 ```bash
@@ -86,7 +90,7 @@ For example:
 java -javaagent:[path-to]/rife2-[version]-agent.jar -jar app/build/libs/hello-uber-1.0.jar
 ```
 
-## Making a native executable
+## Make a native executable
 
 GraalVM supports creating a single Ahead-Of-Time
 [native executable](https://www.graalvm.org/native-image/) from your java
