@@ -13,7 +13,7 @@ version = 1.0
 group = "com.example"
 
 rife2 {
-    version.set("1.7.0")
+    version.set("1.7.2")
     uberMainClass.set("hello.AppSiteUber")
     useAgent.set(true)
     precompiledTemplateTypes.add(HTML)
@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.jsoup:jsoup:1.15.4")
+    testImplementation("org.jsoup:jsoup:1.16.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
 
