@@ -96,7 +96,7 @@ GraalVM supports creating a single Ahead-Of-Time
 [native executable](https://www.graalvm.org/native-image/) from your java
 bytecode.
 
-Once you have at least GraalVM 22.3.1 Java 17 installed, you can generate the native binary with:
+Once you have GraalVM installed, for instance GraalVM for JDK 25, you can generate the native binary with:
 
 ```bash
 ./gradlew nativeCompile
@@ -116,8 +116,11 @@ Alternatively, you can run the native executable directly with:
 ```
 
 > **NOTE:** RIFE2 support for GraalVM native-image is still in preliminary
-> stages. There's no solution yet to replace the features of the RIFE2 Java
-> agent, and it's only been tested in a limited context. When expanding the
+> stages. Features that rely on the RIFE2 Java agent need ahead-of-time
+> instrumentation instead, which you enable with `instrumentAheadOfTime.set(true)`
+> in the `rife2` block, as described in the
+> [GraalVM native image documentation](https://github.com/rife2/rife2/wiki/GraalVM-Native-Image),
+> and it's only been tested in a limited context. When expanding the
 > code of the project, you most likely will have to update the native-image
 > configuration files located in `app/src/main/resources/META-INF/native-image`.
 > More information about that can be found in the [GraalVM manual](https://www.graalvm.org/latest/reference-manual/native-image/metadata/).

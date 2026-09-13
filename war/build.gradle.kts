@@ -10,7 +10,7 @@ base {
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots") } // only needed for SNAPSHOT
+    maven { url = uri("https://central.sonatype.com/repository/maven-snapshots") } // only needed for SNAPSHOT
 }
 
 dependencies {

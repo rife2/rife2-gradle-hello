@@ -4,16 +4,16 @@ import com.uwyn.rife2.gradle.TemplateType.*
 
 plugins {
     application
-    id("com.uwyn.rife2") version "1.2.0"
+    id("com.uwyn.rife2") version "1.3.0"
     `maven-publish`
-    id("org.graalvm.buildtools.native") version "0.9.28"
+    id("org.graalvm.buildtools.native") version "1.1.12"
 }
 
 version = 1.0
 group = "com.example"
 
 rife2 {
-    version.set("1.9.0")
+    version.set("1.10.1")
     uberMainClass.set("hello.AppSiteUber")
     useAgent.set(true)
     precompiledTemplateTypes.add(HTML)
@@ -26,12 +26,14 @@ base {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
-    maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots") } // only needed for SNAPSHOT
+    maven { url = uri("https://central.sonatype.com/repository/maven-snapshots") } // only needed for SNAPSHOT
 }
 
 dependencies {
-    testImplementation("org.jsoup:jsoup:1.18.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testImplementation("org.jsoup:jsoup:1.23.2")
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 application {
@@ -64,6 +66,5 @@ publishing {
 }
 
 graalvmNative.binaries.all {
-    buildArgs.add("--enable-preview") // support for Jetty virtual threads with JDK 19
     imageName.set("hello-$version")
 }
